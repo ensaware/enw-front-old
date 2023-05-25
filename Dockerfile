@@ -1,13 +1,19 @@
 FROM node:19.9.0 AS runner
-WORKDIR /app
+
+ENV APP_HOME /app
+
+WORKDIR $APP_HOME
 
 ENV NODE_ENV production
 
-COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY package.json ./
+COPY package-lock.json ./
 
-USER nextjs
+RUN pnpm install
+
+COPY . ./
+
+RUN pnpm next build
 
 EXPOSE 3000
 
